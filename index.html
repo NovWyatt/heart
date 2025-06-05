@@ -11,9 +11,19 @@
 
 <body>
 
-    <audio autoplay="autopaly" loop="loop" id="audios" preload="auto">
+    <!-- Sửa lỗi chính tả: autoplay="autoplay" thay vì "autopaly" -->
+    <audio autoplay loop id="audios" preload="auto" muted>
         <source src="./Tiramisu_Cake.mp3" type="audio/mpeg" />
     </audio>
+
+    <!-- Overlay để unmute khi user click -->
+    <div id="audioOverlay" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: flex; justify-content: center; align-items: center; z-index: 9999; color: white; font-size: 24px; cursor: pointer;">
+        <div style="text-align: center;">
+            <div style="font-size: 48px; margin-bottom: 20px;">🎵</div>
+            <div>Nhấn để vào đi TIỂU CÔNG CHÚA</div>
+            <div style="font-size: 16px; margin-top: 10px; opacity: 0.7;"></div>
+        </div>
+    </div>
 
     <div class="container" onselectstart="return false;" unselectable="on" style="-moz-user-select:none;">
 
@@ -43,6 +53,47 @@
     <script>
         const gif = document.getElementById("gifBiu");
         gif.src = gif.src + "?t=" + new Date().getTime();
+
+        // Xử lý autoplay audio
+        const audio = document.getElementById("audios");
+        const overlay = document.getElementById("audioOverlay");
+
+        // Thử autoplay khi trang load
+        window.addEventListener('load', function() {
+            // Thử phát muted trước
+            audio.play().then(() => {
+                console.log("Audio đang phát (muted)");
+                // Nếu thành công, hiển thị overlay để unmute
+                overlay.style.display = 'flex';
+            }).catch((error) => {
+                console.log("Autoplay bị chặn hoàn toàn:", error);
+                // Hiển thị overlay để user tương tác
+                overlay.style.display = 'flex';
+            });
+        });
+
+        // Khi user click overlay
+        overlay.addEventListener('click', function() {
+            audio.muted = false; // Bật âm thanh
+            audio.play(); // Phát nhạc
+            overlay.style.display = 'none'; // Ẩn overlay
+        });
+
+        // Backup: Thử autoplay khi có bất kỳ tương tác nào
+        document.addEventListener('click', function() {
+            if (audio.paused) {
+                audio.muted = false;
+                audio.play().catch(e => console.log("Không thể phát:", e));
+            }
+        }, { once: true });
+
+        // Thử autoplay khi hover
+        document.addEventListener('mousemove', function() {
+            if (audio.paused) {
+                audio.muted = false;
+                audio.play().catch(e => console.log("Không thể phát:", e));
+            }
+        }, { once: true });
     </script>
 
     <script type="text/javascript" src="js/love.js"></script>
